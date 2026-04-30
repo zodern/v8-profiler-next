@@ -66,7 +66,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: prebuild-${{ matrix.os }}-node${{ matrix.node-version }}
-          path: prebuilds/**/*.node
+          path: prebuilds
           if-no-files-found: error
           retention-days: 14
 
@@ -80,7 +80,7 @@ jobs:
         with:
           pattern: prebuild-*
           merge-multiple: true
-          path: .
+          path: prebuilds
 
       - name: List collected prebuilds
         run: ls -lR prebuilds
