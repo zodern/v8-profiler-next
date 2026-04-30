@@ -3,25 +3,16 @@
   "version": "1.10.0",
   "description": "node bindings for the v8 profiler",
   "main": "dispatch.js",
-  "binary": {
-    "module_name": "profiler",
-    "module_path": "./build/binding/{configuration}/{node_abi}-{platform}-{arch}/",
-    "remote_path": "./v{version}/",
-    "package_name": "{module_name}-v{version}-{node_abi}-{platform}-{arch}.tar.gz",
-    "host": "https://github.com/hyj1991/v8-profiler-next/releases/download"
-  },
   "scripts": {
-    "install": "node scripts/install.js",
+    "install": "node-gyp-build",
     "build": "node scripts/rebuild.js",
     "dep": "npm run build && npm run test",
-    "pack-common": "node scripts/common.js",
-    "pack-7u": "node scripts/7u.js",
-    "pack-8u": "node scripts/8u.js",
-    "copy": "node scripts/copy.js",
-    "pack": "node scripts/clean.js && node-pre-gyp package && node-pre-gyp testpackage && npm run copy",
+    "prebuild": "node scripts/prebuild.js",
+    "prebuild-all": "node scripts/prebuild-all.js",
+    "clean": "node scripts/clean.js",
     "test-old": "mocha test/*.test.js --exclude test/worker.test.js --timeout 10000",
     "test-new": "mocha test/*.test.js --timeout 10000",
-    "debug-test": "V8_PROFILER_DEBUG=* node scripts/test.js",
+    "debug-test": "cross-env V8_PROFILER_DEBUG=* node scripts/test.js",
     "test": "node scripts/test.js",
     "test-single": "mocha --timeout 10000",
     "format": "clang-format -i --glob=\"src/**/*[.h|.cc]\"",
@@ -45,8 +36,8 @@
   "homepage": "https://github.com/hyj1991/v8-profiler-next#readme",
   "files": [
     "lib",
-    "scripts",
     "src",
+    "prebuilds",
     "binding.gyp",
     "dispatch.js",
     "index.d.ts",
@@ -54,13 +45,15 @@
     "README.md"
   ],
   "dependencies": {
-    "@xprofiler/node-pre-gyp": "^1.0.9",
-    "nan": "^2.18.0"
+    "nan": "^2.18.0",
+    "node-gyp-build": "^4.8.4"
   },
   "devDependencies": {
     "chai": "^4.3.6",
     "clang-format": "^1.8.0",
+    "cross-env": "^10.1.0",
     "eslint": "^8.16.0",
-    "mocha": "^5.2.0"
+    "mocha": "^5.2.0",
+    "prebuildify": "^6.0.1"
   }
 }

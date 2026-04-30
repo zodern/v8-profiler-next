@@ -13,5 +13,4 @@ tmp
 *.heapprofile
 demo.js
 *.log
-config.gypi
-release
+prebuilds

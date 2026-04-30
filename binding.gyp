@@ -1,12 +1,8 @@
 {
-  'includes': [
-    'config.gypi'
-  ],
-
   'variables': {
-    'action_after_build': 'false'
+    # Needed for Node 14
+    'openssl_fips': ''
   },
-
   'targets': [
     {
       'target_name': 'profiler',
@@ -34,8 +30,8 @@
             '-O2',
             '-std=c++17',
             '-Wno-sign-compare',
-            '-Wno-cast-function-type',
-          ],
+            '-Wno-cast-function-type'
+          ]
         }],
         ['OS == "mac"', {
           'xcode_settings': {
@@ -43,32 +39,11 @@
             'OTHER_CFLAGS': [
               '-std=c++17',
               '-Wconversion',
-              '-Wno-sign-conversion',
+              '-Wno-sign-conversion'
             ]
           }
-        }],
+        }]
       ]
-    },
-  ],
-
-  'conditions': [
-    [
-      'action_after_build == "true"',
-      {
-        'targets': [
-          {
-            'target_name': 'action_after_build',
-            'type': 'none',
-            'dependencies': ['<(module_name)'],
-            'copies': [
-              {
-                'files': ['<(PRODUCT_DIR)/<(module_name).node'],
-                'destination': '<(module_path)'
-              }
-            ]
-          },
-        ]
-      }
-    ]
-  ],
+    }
+  ]
 }

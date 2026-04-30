@@ -1,5 +1,10 @@
 'use strict';
 
-const execCmd = require('./gyp');
+const cp = require('child_process');
+const path = require('path');
 
-execCmd('node-gyp rebuild', 'node-pre-gyp rebuild');
+cp.execSync('node-gyp rebuild', {
+  cwd: path.join(__dirname, '..'),
+  stdio: 'inherit',
+  env: process.env,
+});
