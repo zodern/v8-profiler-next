@@ -41,6 +41,15 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
+      # Node 14's bundled node-gyp v5 doesn't recognize Visual Studio 2022
+      # on windows-latest. Override with a modern node-gyp for that target.
+      - name: Use modern node-gyp on Windows + Node 14
+        if: matrix.os == 'windows-latest' && matrix.node-version == 14
+        shell: bash
+        run: |
+          npm install -g node-gyp@9
+          echo "npm_config_node_gyp=$(npm root -g)/node-gyp/bin/node-gyp.js" >> "$GITHUB_ENV"
+
       - name: Install
         run: npm install --foreground-scripts
 
