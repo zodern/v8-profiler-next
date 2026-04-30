@@ -16,10 +16,10 @@ jobs:
           - ubuntu-latest          # linux x64
           - ubuntu-24.04-arm       # linux arm64
           - macos-latest           # darwin arm64
-          - macos-13               # darwin x64
+          - macos-15-intel         # darwin x64
           - windows-latest         # win32 x64
         node-version: [ 14, 20, 22 ]
-        exclude:
+        exclude: # These don't work on arm
           - os: ubuntu-24.04-arm
             node-version: 14
           - os: macos-latest
