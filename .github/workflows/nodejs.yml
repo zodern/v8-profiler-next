@@ -29,10 +29,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Node 14 uses node-gyp v5. Its vendored gyp uses Python's 'rU'
+      # open mode which was removed in Python 3.11
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: ${{ matrix.node-version == 14 && '3.10' || '3.11' }}
 
       - name: Set up Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
