@@ -18,9 +18,14 @@ for (const arg of process.argv.slice(2)) {
   }
 }
 
-const args = ['prebuildify', '--no-napi', '--strip', '--target', target, ...passthrough];
+const prebuildifyBin = path.join(
+  path.dirname(require.resolve('prebuildify/package.json')),
+  'bin.js'
+);
 
-cp.execFileSync('npx', args, {
+const args = [prebuildifyBin, '--no-napi', '--strip', '--target', target, ...passthrough];
+
+cp.execFileSync(process.execPath, args, {
   cwd: path.join(__dirname, '..'),
   stdio: 'inherit',
   env: process.env,
