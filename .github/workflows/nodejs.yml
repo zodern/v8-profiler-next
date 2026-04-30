@@ -4,56 +4,81 @@ on:
     branches: [ '**' ]
   pull_request:
     branches: [ '**' ]
-  schedule:
-    - cron: '0 2 * * *'
+
 jobs:
-  ubuntu:
+  test:
+    name: ${{ matrix.os }} / node ${{ matrix.node-version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest          # linux x64
+          - ubuntu-24.04-arm       # linux arm64
+          - macos-latest           # darwin arm64
+          - macos-13               # darwin x64
+          - windows-latest         # win32 x64
+        node-version: [ 14, 20, 22 ]
+        exclude:
+          - os: ubuntu-24.04-arm
+            node-version: 14
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install
+        run: npm install --foreground-scripts
+
+      - name: Run tests
+        run: npm run debug-test
+
+      - name: Build prebuild
+        run: npm run prebuild
+
+      - name: Verify prebuild loads
+        run: node scripts/verify-prebuild.js
+
+      - name: Upload prebuild artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: prebuild-${{ matrix.os }}-node${{ matrix.node-version }}
+          path: prebuilds/**/*.node
+          if-no-files-found: error
+          retention-days: 14
+
+  bundle:
+    name: Bundle all prebuilds
+    needs: test
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        node-version: [ 12, 14, 16, 18, 20 ]
     steps:
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
+      - name: Download all prebuild artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: prebuild-*
+          merge-multiple: true
+          path: .
 
-    - name: Checkout Git Source
-      uses: actions/checkout@master
+      - name: List collected prebuilds
+        run: ls -lR prebuilds
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
+      - name: Create combined tarball
+        run: tar -czf v8-profiler-next-prebuilds.tar.gz prebuilds
 
-    - name: Install Dependencies
-      run: npm i
-
-    - name: Continuous integration
-      run: npm run debug-test
-  macos:
-    runs-on: macos-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        node-version: [ 12, 14, 16, 18, 20 ]
-    steps:
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
-
-    - name: Checkout Git Source
-      uses: actions/checkout@master
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-
-    - name: Install Dependencies
-      run: npm i
-
-    - name: Continuous integration
-      run: npm run debug-test
+      - name: Upload combined tarball
+        uses: actions/upload-artifact@v4
+        with:
+          name: prebuilds-bundle
+          path: v8-profiler-next-prebuilds.tar.gz
+          if-no-files-found: error
+          retention-days: 30

@@ -8,7 +8,7 @@ module.exports = {
   ],
   dep: [
     'nan',
-    '@xprofiler/node-pre-gyp',
+    'node-gyp-build',
   ],
   devdep: [
     'autod',
@@ -16,6 +16,7 @@ module.exports = {
     'clang-format',
     'eslint',
     'mocha',
+    'prebuildify',
   ],
   exclude: [
     './build',
