@@ -9,6 +9,8 @@
     "dep": "npm run build && npm run test",
     "prebuild": "node scripts/prebuild.js",
     "prebuild-all": "node scripts/prebuild-all.js",
+    "verify-prebuild": "node scripts/verify-prebuild.js",
+    "prepublishOnly": "node scripts/verify-prebuilds.js",
     "clean": "node scripts/clean.js",
     "test-old": "mocha test/*.test.js --exclude test/worker.test.js --timeout 10000",
     "test-new": "mocha test/*.test.js --timeout 10000",
