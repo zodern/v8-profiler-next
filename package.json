@@ -1,5 +1,5 @@
 {
-  "name": "v8-profiler-next",
+  "name": "@zodern/v8-profiler-next",
   "version": "1.10.0",
   "description": "node bindings for the v8 profiler",
   "main": "dispatch.js",
@@ -22,7 +22,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hyj1991/v8-profiler-next.git"
+    "url": "git+https://github.com/zodern/v8-profiler-next.git"
   },
   "keywords": [
     "node",
@@ -31,9 +31,9 @@
   "author": "https://github.com/hyj1991",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/hyj1991/v8-profiler-next/issues"
+    "url": "https://github.com/zodern/v8-profiler-next/issues"
   },
-  "homepage": "https://github.com/hyj1991/v8-profiler-next#readme",
+  "homepage": "https://github.com/zodern/v8-profiler-next#readme",
   "files": [
     "lib",
     "src",

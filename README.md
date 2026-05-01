@@ -1,20 +1,14 @@
 # v8-profiler-next
 
-[![npm version](https://img.shields.io/npm/v/v8-profiler-next/latest.svg)](https://www.npmjs.com/package/v8-profiler-next)
-[![Package Quality](http://npm.packagequality.com/shield/v8-profiler-next.svg)](http://packagequality.com/#?package=v8-profiler-next)
-[![Linux/osx build status](https://github.com/hyj1991/v8-profiler-next/workflows/Continuous%20integration/badge.svg?branch=master)](https://github.com/hyj1991/v8-profiler-next/actions?query=branch%3Amaster)
-[![windows build status](https://ci.appveyor.com/api/projects/status/vp54r2t137iirntf?svg=true)](https://ci.appveyor.com/project/hyj1991/v8-profiler-next)
-[![downloads info](https://img.shields.io/npm/dm/v8-profiler-next.svg)](https://www.npmjs.com/package/v8-profiler-next)
-[![license](https://img.shields.io/npm/l/v8-profiler-next.svg)](LICENSE)
-
 ## Description
 
-v8-profiler-next provides [node](https://github.com/nodejs/node) bindings for the v8 profiler.
+`@zodern/v8-profiler-next` provides [node](https://github.com/nodejs/node) bindings for the v8 profiler.
+Fork of [v8-profiler-next](https://github.com/hyj1991/v8-profiler-next), to replace node-pre-gyp with prebuildify.
 
 ## I. Quick Start
 
 * **Compatibility**
-  * **node version:** v4.x ~ v21.x
+  * **node version:** v14.x ~ v22.x
   * **platform:** mac, linux, windows
 
 This module can also be used in `worker_threads`.
@@ -24,7 +18,7 @@ This module can also be used in `worker_threads`.
 ```js
 'use strict';
 const fs = require('fs');
-const v8Profiler = require('v8-profiler-next');
+const v8Profiler = require('@zodern/v8-profiler-next');
 const title = 'good-name';
 
 // set generateType 1 to generate new format for cpuprofile
@@ -56,7 +50,7 @@ Get `.cpuprofile` in `worker_threads`:
 
 const fs = require('fs');
 const path = require('path');
-const v8Profiler = require('v8-profiler-next');
+const v8Profiler = require('@zodern/v8-profiler-next');
 const workerThreads = require('worker_threads');
 
 v8Profiler.setGenerateType(1);
@@ -89,7 +83,7 @@ if (workerThreads.isMainThread) {
 
 ```js
 'use strict';
-const v8Profiler = require('v8-profiler-next');
+const v8Profiler = require('@zodern/v8-profiler-next');
 const snapshot = v8Profiler.takeSnapshot();
 // 1. not as stream
 snapshot.export(function (error, result) {
@@ -113,7 +107,7 @@ Get `.heapsnapshot` in `worker_threads`:
 
 const fs = require('fs');
 const path = require('path');
-const v8Profiler = require('v8-profiler-next');
+const v8Profiler = require('@zodern/v8-profiler-next');
 const workerThreads = require('worker_threads');
 
 function createSnapshot(filename) {
@@ -148,7 +142,7 @@ if (workerThreads.isMainThread) {
 
 ```js
 'use strict';
-const v8Profiler = require('v8-profiler-next');
+const v8Profiler = require('@zodern/v8-profiler-next');
 // set a leak array
 const arraytest = [];
 setInterval(() => {
@@ -172,7 +166,7 @@ Get `.heapprofile` in `worker_threads`:
 
 const fs = require('fs');
 const path = require('path');
-const v8Profiler = require('v8-profiler-next');
+const v8Profiler = require('@zodern/v8-profiler-next');
 const workerThreads = require('worker_threads');
 
 if (workerThreads.isMainThread) {
