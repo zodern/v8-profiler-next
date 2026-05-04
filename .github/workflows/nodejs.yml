@@ -59,6 +59,11 @@ jobs:
       - name: Build prebuild
         run: npm run prebuild
 
+      # Cross-compile a darwin-arm64 prebuild for Node 14
+      - name: Cross-compile darwin-arm64 prebuild for Node 14
+        if: matrix.os == 'macos-latest' && matrix.node-version == 22
+        run: node scripts/prebuild.js --target=14.21.3 --arch=arm64
+
       - name: Verify prebuild loads
         run: node scripts/verify-prebuild.js
 

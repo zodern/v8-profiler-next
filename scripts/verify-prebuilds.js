@@ -40,7 +40,7 @@ for(const platform of dirents) {
   }
 }
 
-if (buildsCount !== 13) {
+if (buildsCount !== 14) {
   throw new Error(`Wrong number of builds: ${buildsCount}`);
 }
 
