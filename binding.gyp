@@ -28,7 +28,7 @@
         ['OS == "linux"', {
           'cflags': [
             '-O2',
-            '-std=c++17',
+            '-std=c++20',
             '-Wno-sign-compare',
             '-Wno-cast-function-type'
           ]
@@ -37,7 +37,7 @@
           'xcode_settings': {
             'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
             'OTHER_CFLAGS': [
-              '-std=c++17',
+              '-std=c++20',
               '-Wconversion',
               '-Wno-sign-conversion'
             ]
