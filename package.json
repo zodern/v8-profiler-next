@@ -9,6 +9,7 @@
     "dep": "npm run build && npm run test",
     "prebuild": "node scripts/prebuild.js",
     "prebuild-all": "node scripts/prebuild-all.js",
+    "prebuild-cross": "node scripts/prebuild-cross.js",
     "verify-prebuild": "node scripts/verify-prebuild.js",
     "prepublishOnly": "node scripts/verify-prebuilds.js",
     "clean": "node scripts/clean.js",
