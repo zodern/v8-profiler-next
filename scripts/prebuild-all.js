@@ -1,29 +1,27 @@
 'use strict';
 
-// Builds prebuilds for each target Node version. Run once per host
-// platform. Override targets with PREBUILD_NODE_VERSIONS=20.19.3,22.22.2.
+// Builds every prebuild this host can produce. Run once per host platform; CI
+// spreads the same work across runners. Targets come from scripts/targets.js.
+// Override the Node versions with PREBUILD_NODE_VERSIONS=20.20.2,22.23.1.
 
 const cp = require('child_process');
 const path = require('path');
-const os = require('os');
 
-// Node 24 omitted: current C++ doesn't compile against V8 13.6 yet.
-const DEFAULT_VERSIONS = [
-  '14.21.3',
-  '20.19.3',
-  '22.22.2',
-];
+const { PLATFORMS, targetsFor } = require('./targets');
 
-// macOS arm64 support landed in Node 16.
-function archsFor(version) {
-  const major = parseInt(version.split('.')[0], 10);
-  if (os.platform() === 'darwin') {
-    return major >= 16 ? ['arm64', 'x64'] : ['x64'];
-  }
-  return [process.arch];
+// macOS builds both darwin arches (clang cross-compiles between them); other
+// hosts only build for their own arch.
+const platforms = PLATFORMS.filter(p => {
+  if (p.platform !== process.platform) {return false;}
+  return p.platform === 'darwin' || p.arch === process.arch;
+});
+
+if (platforms.length === 0) {
+  console.error(`No prebuild platform for ${process.platform}-${process.arch}`);
+  process.exit(1);
 }
 
-const versions = (process.env.PREBUILD_NODE_VERSIONS || DEFAULT_VERSIONS.join(','))
+const override = (process.env.PREBUILD_NODE_VERSIONS || '')
   .split(',')
   .map(v => v.trim())
   .filter(Boolean);
@@ -31,19 +29,23 @@ const versions = (process.env.PREBUILD_NODE_VERSIONS || DEFAULT_VERSIONS.join(',
 const cwd = path.join(__dirname, '..');
 const failed = [];
 
-for (const v of versions) {
-  for (const arch of archsFor(v)) {
-    console.log(`\n>>> prebuilding for Node ${v} / ${arch}`);
+for (const platform of platforms) {
+  const versions = override.length
+    ? override
+    : targetsFor(platform).map(t => t.version);
+
+  for (const version of versions) {
+    console.log(`\n>>> prebuilding ${platform.dir} for Node ${version}`);
     try {
-      cp.execFileSync('node', [
-        'scripts/prebuild.js',
-        `--target=${v}`,
-        `--arch=${arch}`,
+      cp.execFileSync(process.execPath, [
+        path.join(__dirname, 'prebuild.js'),
+        `--target=${version}`,
+        `--arch=${platform.arch}`,
       ], { cwd, stdio: 'inherit', env: process.env });
-      console.log(`<<< Node ${v} / ${arch} done`);
+      console.log(`<<< ${platform.dir} / Node ${version} done`);
     } catch (err) {
-      console.error(`!!! Node ${v} / ${arch} FAILED: ${err.message}`);
-      failed.push(`${v} (${arch})`);
+      console.error(`!!! ${platform.dir} / Node ${version} FAILED: ${err.message}`);
+      failed.push(`${platform.dir} / ${version}`);
     }
   }
 }

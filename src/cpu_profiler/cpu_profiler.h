@@ -21,7 +21,7 @@ namespace nodex {
 
 class CpuProfiler {
  public:
-  static void Initialize(v8::Local<v8::Object> target);
+  static void Initialize(v8::Isolate* isolate, v8::Local<v8::Object> target);
 
   CpuProfiler();
   virtual ~CpuProfiler();

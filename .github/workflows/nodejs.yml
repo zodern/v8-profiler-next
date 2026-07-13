@@ -6,24 +6,27 @@ on:
     branches: [ '**' ]
 
 jobs:
+  matrix:
+    name: Create matrix
+    runs-on: ubuntu-latest
+    outputs:
+      include: ${{ steps.matrix.outputs.include }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create matrix
+        id: matrix
+        run: echo "include=$(node scripts/ci-matrix.js)" >> "$GITHUB_OUTPUT"
+
   test:
-    name: ${{ matrix.os }} / node ${{ matrix.node-version }}
+    name: ${{ matrix.name }}
+    needs: matrix
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os:
-          - ubuntu-latest          # linux x64
-          - ubuntu-24.04-arm       # linux arm64
-          - macos-latest           # darwin arm64
-          - macos-15-intel         # darwin x64
-          - windows-latest         # win32 x64
-        node-version: [ 14, 20, 22 ]
-        exclude: # These don't work on arm
-          - os: ubuntu-24.04-arm
-            node-version: 14
-          - os: macos-latest
-            node-version: 14
+        include: ${{ fromJSON(needs.matrix.outputs.include) }}
 
     steps:
       - name: Checkout
@@ -34,21 +37,17 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.node-version == 14 && '3.10' || '3.11' }}
+          python-version: ${{ matrix.python }}
 
-      - name: Set up Node.js ${{ matrix.node-version }}
+      - name: Set up Node.js ${{ matrix.node }}
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: ${{ matrix.node }}
 
-      # Node 14's bundled node-gyp v5 doesn't recognize Visual Studio 2022
-      # on windows-latest. Override with a modern node-gyp for that target.
-      - name: Use modern node-gyp on Windows + Node 14
-        if: matrix.os == 'windows-latest' && matrix.node-version == 14
-        shell: bash
-        run: |
-          npm install -g node-gyp@9
-          echo "npm_config_node_gyp=$(npm root -g)/node-gyp/bin/node-gyp.js" >> "$GITHUB_ENV"
+      # Update node-gyp to a version that can find the Visual Studio release.
+      - name: Override node-gyp
+        if: matrix.nodeGyp != ''
+        run: npm install --save-dev --ignore-scripts "${{ matrix.nodeGyp }}"
 
       - name: Install
         run: npm install --foreground-scripts
@@ -59,10 +58,10 @@ jobs:
       - name: Build prebuild
         run: npm run prebuild
 
-      # Cross-compile a darwin-arm64 prebuild for Node 14
-      - name: Cross-compile darwin-arm64 prebuild for Node 14
-        if: matrix.os == 'macos-latest' && matrix.node-version == 22
-        run: npm run prebuild -- --target=14.21.3 --arch=arm64
+      # Some versions don't have a runner and are cross compiled
+      # such as with the Node 14 arm build
+      - name: Cross-compile prebuilds
+        run: npm run prebuild-cross
 
       - name: Verify prebuild loads
         run: node scripts/verify-prebuild.js
@@ -70,7 +69,7 @@ jobs:
       - name: Upload prebuild artifact
         uses: actions/upload-artifact@v4
         with:
-          name: prebuild-${{ matrix.os }}-node${{ matrix.node-version }}
+          name: prebuild-${{ matrix.os }}-node${{ matrix.node }}
           path: prebuilds
           if-no-files-found: error
           retention-days: 14
@@ -80,6 +79,14 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
       - name: Download all prebuild artifacts
         uses: actions/download-artifact@v4
         with:
@@ -89,6 +96,11 @@ jobs:
 
       - name: List collected prebuilds
         run: ls -lR prebuilds
+
+      - name: Verify the full set of prebuilds
+        run: |
+          npm install --ignore-scripts
+          node scripts/verify-prebuilds.js
 
       - name: Create combined tarball
         run: tar -czf v8-profiler-next-prebuilds.tar.gz prebuilds

@@ -55,8 +55,8 @@ class ActivityControlAdapter : public ActivityControl {
   Local<Value> abort;
 };
 
-void HeapProfiler::Initialize(Local<Object> target) {
-  HandleScope scope(target->GetIsolate());
+void HeapProfiler::Initialize(v8::Isolate* isolate, Local<Object> target) {
+  HandleScope scope(isolate);
 
   Local<Object> heapProfiler = Nan::New<Object>();
   Local<Object> snapshots = Nan::New<Object>();
