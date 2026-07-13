@@ -42,6 +42,24 @@
               '-Wno-sign-conversion'
             ]
           }
+        }],
+        ['OS == "win"', {
+          # Remove clang-only options Node used
+          'configurations': {
+            'Release': {
+              'msvs_settings': {
+                'VCCLCompilerTool': {
+                  'AdditionalOptions/': [ ['exclude', '-flto|lldltojobs'] ]
+                },
+                'VCLibrarianTool': {
+                  'AdditionalOptions/': [ ['exclude', '-flto|lldltojobs'] ]
+                },
+                'VCLinkerTool': {
+                  'AdditionalOptions/': [ ['exclude', '-flto|lldltojobs'] ]
+                }
+              }
+            }
+          }
         }]
       ]
     }

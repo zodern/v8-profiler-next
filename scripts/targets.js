@@ -46,6 +46,16 @@ const PLATFORMS = [
     os: 'windows-latest',
     platform: 'win32',
     arch: 'x64',
+    // windows-latest ships Visual Studio 2026, which only node-gyp 12.4 and
+    // newer can find. npm bundles an older node-gyp for every Node we build.
+    nodeGyp: 'node-gyp@12',
+    overrides: {
+      // node-gyp 12 needs Node 20.17+, and the newest node-gyp Node 14 can run
+      // (v9) only knows about Visual Studio 2022. So Node 14 builds on the
+      // image that still has it. Its bundled node-gyp (v5) is older still and
+      // doesn't recognize VS 2022 either, hence the override there as well.
+      14: { os: 'windows-2022', nodeGyp: 'node-gyp@9' },
+    },
   },
 ];
 
@@ -73,6 +83,21 @@ function crossTargetsFor(platform, major) {
   return targetsFor(platform).filter(t => cannotRun.includes(t.major));
 }
 
+// The CI job that builds and tests `target` on `platform`. Some targets need a
+// different runner image or node-gyp than the platform's default.
+function jobFor(platform, target) {
+  const overrides = (platform.overrides || {})[target.major] || {};
+
+  return {
+    name: `${platform.dir} / node ${target.major}`,
+    os: overrides.os || platform.os,
+    node: target.major,
+    python: pythonFor(target.major),
+    // Empty when the node-gyp npm bundles works. CI skips the install then.
+    nodeGyp: overrides.nodeGyp || platform.nodeGyp || '',
+  };
+}
+
 // prebuildify names files after the package, with '/' replaced by '+'.
 function prebuildName(abi) {
   return `${pkg.name.replace('/', '+')}.abi${abi}.node`;
@@ -89,6 +114,7 @@ module.exports = {
   targetsFor,
   runnableTargetsFor,
   crossTargetsFor,
+  jobFor,
   prebuildName,
   platformFor,
 };
