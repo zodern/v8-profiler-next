@@ -8,7 +8,7 @@ Fork of [v8-profiler-next](https://github.com/hyj1991/v8-profiler-next), to repl
 ## I. Quick Start
 
 * **Compatibility**
-  * **node version:** v14.x ~ v22.x
+  * **node version:** v14.x ~ v26.x
   * **platform:** mac, linux, windows
 
 This module can also be used in `worker_threads`.
