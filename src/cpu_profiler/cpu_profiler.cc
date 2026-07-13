@@ -19,8 +19,8 @@ extern thread_local Nan::Persistent<Object> profiles;
 CpuProfiler::CpuProfiler() {}
 CpuProfiler::~CpuProfiler() {}
 
-void CpuProfiler::Initialize(Local<Object> target) {
-  HandleScope scope(target->GetIsolate());
+void CpuProfiler::Initialize(v8::Isolate* isolate, Local<Object> target) {
+  HandleScope scope(isolate);
 
   Local<Object> cpuProfiler = Nan::New<Object>();
   Local<Array> profiles = Nan::New<Array>();

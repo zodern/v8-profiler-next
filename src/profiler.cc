@@ -13,7 +13,7 @@ namespace nodex {
                .ToLocalChecked())
 
 void InitializeProfiler(v8::Local<v8::Object> target) {
-  v8::Isolate* isolate = target->GetIsolate();
+  v8::Isolate* isolate = v8::Isolate::GetCurrent();
   HandleScope scope(isolate);
 
   // create enviroment data
@@ -22,9 +22,9 @@ void InitializeProfiler(v8::Local<v8::Object> target) {
   CREATE_JS_BINDING(setup, EnvironmentData::JsSetupEnvironmentData);
 
   // register profiler
-  HeapProfiler::Initialize(target);
-  CpuProfiler::Initialize(target);
-  SamplingHeapProfiler::Initialize(target);
+  HeapProfiler::Initialize(isolate, target);
+  CpuProfiler::Initialize(isolate, target);
+  SamplingHeapProfiler::Initialize(isolate, target);
 }
 
 NODE_MODULE_CONTEXT_AWARE(profiler, InitializeProfiler)

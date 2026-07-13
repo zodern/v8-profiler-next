@@ -17,7 +17,7 @@ namespace nodex {
 
 class SamplingHeapProfiler {
  public:
-  static void Initialize(v8::Local<v8::Object> target);
+  static void Initialize(v8::Isolate* isolate, v8::Local<v8::Object> target);
   SamplingHeapProfiler();
   virtual ~SamplingHeapProfiler();
 
