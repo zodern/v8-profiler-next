@@ -44,13 +44,10 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
-      # Update node-gyp to a version that can find the Visual Studio release
+      # Update node-gyp to a version that can find the Visual Studio release.
       - name: Override node-gyp
         if: matrix.nodeGyp != ''
-        shell: bash
-        run: |
-          npm install -g "${{ matrix.nodeGyp }}"
-          echo "npm_config_node_gyp=$(npm root -g)/node-gyp/bin/node-gyp.js" >> "$GITHUB_ENV"
+        run: npm install --save-dev --ignore-scripts "${{ matrix.nodeGyp }}"
 
       - name: Install
         run: npm install --foreground-scripts
